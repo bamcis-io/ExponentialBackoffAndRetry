@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard1.6;net45</TargetFrameworks>
+    <NetStandardImplicitPackageVersion>1.6</NetStandardImplicitPackageVersion>
+    <RootNamespace>BAMCIS.ExponentialBackoffAndRetry</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Michael Haken</Authors>
+    <Company>bamcis.io</Company>
+    <PackageProjectUrl>https://github.com/bamcis-io/ExponentialBackoffAndRetry</PackageProjectUrl>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/bamcis-io/ExponentialBackoffAndRetry</RepositoryUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/bamcis-io/ExponentialBackoffAndRetry/master/LICENSE</PackageLicenseUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>Exponential Backoff Retry</PackageTags>
+    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <Copyright>bamcis.io</Copyright>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>ExponentialBackoffAndRetry.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+  </ItemGroup>
+
+</Project>
