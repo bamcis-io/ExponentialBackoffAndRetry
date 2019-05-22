@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,15 +7,21 @@ using Xunit;
 
 namespace BAMCIS.ExponentialBackoffAndRetry.Tests
 {
-    public class UnitTest1
+    public class ExponentialBackoffAndRetryClientTests
     {
         [Fact]
         public async Task ClientTest()
         {
             // ARRANGE
-            ExponentialBackoffAndRetryClient backoffClient = new ExponentialBackoffAndRetryClient(5, 100);
+            ExponentialBackoffAndRetryClient backoffClient = new ExponentialBackoffAndRetryClient(
+                new ExponentialBackoffAndRetryConfig()
+                {
+                    MaximumRetries = 5,
+                    DelayInMilliseconds = 100,
+                    Jitter = Jitter.NONE
+                }
+            );
             Stopwatch sw = new Stopwatch();
-            Action test = () => { };
 
             // ACT
             sw.Start();
@@ -42,7 +47,15 @@ namespace BAMCIS.ExponentialBackoffAndRetry.Tests
         public async Task ManyRetriesWithLongMaxDelay()
         {
             // ARRANGE
-            ExponentialBackoffAndRetryClient backoffClient = new ExponentialBackoffAndRetryClient(50, 100, 10000);
+            ExponentialBackoffAndRetryClient backoffClient = new ExponentialBackoffAndRetryClient(
+                new ExponentialBackoffAndRetryConfig()
+                {
+                    MaximumRetries = 50,
+                    DelayInMilliseconds = 100,
+                    MaxBackoffInMilliseconds = 10000,
+                    Jitter = Jitter.NONE
+                }
+            );
             Stopwatch sw = new Stopwatch();
             Action test = () => { };
 
@@ -70,7 +83,14 @@ namespace BAMCIS.ExponentialBackoffAndRetry.Tests
         public async Task ManyRetriesWithStandardMaxDelay()
         {
             // ARRANGE
-            ExponentialBackoffAndRetryClient backoffClient = new ExponentialBackoffAndRetryClient(50, 100);
+            ExponentialBackoffAndRetryClient backoffClient = new ExponentialBackoffAndRetryClient(
+                new ExponentialBackoffAndRetryConfig()
+                {
+                    MaximumRetries = 50,
+                    DelayInMilliseconds = 100,
+                    Jitter = Jitter.NONE
+                }
+            );
             Stopwatch sw = new Stopwatch();
             Action test = () => { };
 
@@ -98,20 +118,25 @@ namespace BAMCIS.ExponentialBackoffAndRetry.Tests
         public async Task CustomExceptionHandling()
         {
             // ARRANGE
-            ExponentialBackoffAndRetryClient backoffClient = new ExponentialBackoffAndRetryClient(50, 100)
-            {
-                ExceptionHandlingLogic = (ex) =>
+            ExponentialBackoffAndRetryClient backoffClient = new ExponentialBackoffAndRetryClient(
+                new ExponentialBackoffAndRetryConfig()
                 {
-                    if (ex is InvalidOperationException)
+                    MaximumRetries = 50,
+                    DelayInMilliseconds = 100,
+                    Jitter = Jitter.NONE,
+                    ExceptionHandlingLogic = (ex) =>
                     {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
+                        if (ex is InvalidOperationException)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 }
-            };
+            );
 
             Stopwatch sw = new Stopwatch();
             Action test = () => { };
@@ -140,20 +165,25 @@ namespace BAMCIS.ExponentialBackoffAndRetry.Tests
         public async Task CustomExceptionHandlingFail()
         {
             // ARRANGE
-            ExponentialBackoffAndRetryClient backoffClient = new ExponentialBackoffAndRetryClient(50, 100)
-            {
-                ExceptionHandlingLogic = (ex) =>
+            ExponentialBackoffAndRetryClient backoffClient = new ExponentialBackoffAndRetryClient(
+                new ExponentialBackoffAndRetryConfig()
                 {
-                    if (ex is InvalidOperationException)
+                    MaximumRetries = 50,
+                    DelayInMilliseconds = 100,
+                    Jitter = Jitter.NONE,
+                    ExceptionHandlingLogic = (ex) =>
                     {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
+                        if (ex is InvalidOperationException)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 }
-            };
+            );
 
             Stopwatch sw = new Stopwatch();
             Action test = () => { };
@@ -182,7 +212,14 @@ namespace BAMCIS.ExponentialBackoffAndRetry.Tests
         public async Task RetriesExceeded()
         {
             // ARRANGE
-            ExponentialBackoffAndRetryClient backoffClient = new ExponentialBackoffAndRetryClient(5, 100);
+            ExponentialBackoffAndRetryClient backoffClient = new ExponentialBackoffAndRetryClient(
+               new ExponentialBackoffAndRetryConfig()
+               {
+                   MaximumRetries = 5,
+                   DelayInMilliseconds = 100,
+                   Jitter = Jitter.NONE
+               }
+            );
             Stopwatch sw = new Stopwatch();
 
             // ACT

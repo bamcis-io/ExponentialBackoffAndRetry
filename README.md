@@ -4,9 +4,13 @@ A generic implementation of a client that will run a task with exponential backo
 
 ## Table of Contents
 - [Usage](#usage)
+  * [Client](#client)
+  * [Handler](#handler)
 - [Revision History](#revision-history)
 
 ## Usage
+
+### Client
 
 Import the package:
 
@@ -41,9 +45,37 @@ By default the exception handling logic treats `TimeoutException`, `OperationCan
         }
     };
 
-While this is contrived since the AWS .NET SDK provided embedded backoff and retry capabilities, it's  a simple demonstration of how you can control whether or not the retry is invoked.
+While this is contrived since the AWS .NET SDK provides embedded backoff and retry capabilities, it's  a simple demonstration of how you can control whether or not the retry is invoked.
+
+    GetObjectResponse response = await backoffClient.RunAsync(() => s3Client.GetObjectAsync(bucket, key));
+
+### Handler
+
+You can also provide the custom `HttpMessageHandler` implementation to an `HttpClient` to perform automatic backoff and retry. The `SendAsync` method checks that the status code is successful and if not, throws an `HttpResponseException` that is caught by the default exception handling logic, but can also be caught in your own logic. The `HttpResponseException` exposes the response `StatusCode` property so you can check for specific status codes like 503 in your exception handling.
+
+    HttpClient httpClient = new HttpClient(
+        new ExponentialBackoffAndRetryHandler(
+            new ExponentialBackoffAndRetryClient()
+            {
+                Config = new ExponentialBackoffAndRetryConfig()
+                {
+                    DelayInMilliseconds = 100,
+                    MaximumRetries = 5,
+                    Jitter = Jitter.NONE
+                }
+            },
+            new HttpMessageHandler()
+        )
+    );
+
+    HttpResponseMessage response = await httpClient.SendAsync(request);
+
+The `HttpClient` will implement a retry with exponental backoff using no jitter for the requests when any non success status code is returned. You may want to set a custom exception handler for the `BackoffAndRetryConfig` so that you only retry on certain status codes, e.g. you probably don't want to retry for a 404.
 
 ## Revision History
+
+### 2.0.0
+Added jitter to backoff and changed the client to take a config object. Additionally, added an `HttpMessageHandler` variant so this can be used with an `HttpClient`.
 
 ### 1.0.0
 Initial release of the library.
